@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -25,12 +26,14 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.animatedVectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import kiwi.orbit.OrbitTheme
-import kiwi.orbit.icons.Icons
+import kiwi.orbit.R
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 public fun Checkbox(
     checked: Boolean,
@@ -93,8 +96,11 @@ public fun Checkbox(
             drawCheckbox(borderColor, backgroundColor)
         }
         if (checked) {
+            val drawable = animatedVectorResource(R.drawable.avd_check)
+            drawable.
+            val painter = drawable.painterFor(atEnd = true)
             Icon(
-                Icons.Check,
+                painter = painter,
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 4.dp, top = 4.dp)
