@@ -63,6 +63,7 @@ fun MainScreen(
     )
 
     val demos = listOf<Triple<String, @Composable () -> Unit, () -> Unit>>(
+        Triple("Itinerary", { Icon(Icons.List, null) }, actions::showXItinerary),
         Triple("Profile", { Icon(Icons.AccountCircle, null) }, actions::showXProfile),
     )
 

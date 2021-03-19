@@ -20,6 +20,7 @@ import kiwi.orbit.compose.catalog.screens.SwitchScreen
 import kiwi.orbit.compose.catalog.screens.TagScreen
 import kiwi.orbit.compose.catalog.screens.TextFieldScreen
 import kiwi.orbit.compose.catalog.screens.TypographyScreen
+import kiwi.orbit.compose.catalog.screens.XItineraryScreen
 import kiwi.orbit.compose.catalog.screens.XProfileScreen
 
 private object MainDestinations {
@@ -40,6 +41,7 @@ private object MainDestinations {
     const val TAG = "tag"
     const val TEXT_FIELD = "text_field"
 
+    const val X_ITINERARY = "x_itinerary"
     const val X_PROFILE = "x_profile"
 }
 
@@ -98,6 +100,10 @@ fun NavGraph(
         }
         composable(MainDestinations.TEXT_FIELD) {
             TextFieldScreen(actions::navigateUp)
+        }
+
+        composable(MainDestinations.X_ITINERARY) {
+            XItineraryScreen(actions::navigateUp)
         }
 
         composable(MainDestinations.X_PROFILE) {
@@ -163,6 +169,10 @@ class MainActions(
 
     fun showTextField() {
         navController.navigate(MainDestinations.TEXT_FIELD)
+    }
+
+    fun showXItinerary() {
+        navController.navigate(MainDestinations.X_ITINERARY)
     }
 
     fun showXProfile() {

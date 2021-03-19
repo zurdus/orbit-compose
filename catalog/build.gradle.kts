@@ -84,6 +84,7 @@ dependencies {
     implementation(projects.illustrations)
 
     implementation(libs.androidx.core)
+    implementation(libs.androidx.constraintLayout)
     implementation(libs.androidx.activityCompose)
 
     implementation(libs.compose.animation)
