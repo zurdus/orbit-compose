@@ -1,9 +1,11 @@
 package kiwi.orbit.compose.catalog.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -24,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
@@ -36,6 +40,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import coil.compose.rememberImagePainter
+import coil.size.Scale
+import coil.transform.CircleCropTransformation
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import kiwi.orbit.compose.catalog.SubScreen
 import kiwi.orbit.compose.icons.Icons
 import kiwi.orbit.compose.ui.OrbitTheme
@@ -46,6 +58,8 @@ import kiwi.orbit.compose.ui.controls.Text
 import kiwi.orbit.compose.ui.foundation.ContentEmphasis
 import kiwi.orbit.compose.ui.foundation.LocalContentEmphasis
 import kiwi.orbit.compose.ui.foundation.ProvideMergedTextStyle
+import kotlinx.serialization.json.Json
+
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -65,52 +79,67 @@ fun XItineraryScreen(onUpClick: () -> Unit) {
 @Preview
 @Composable
 fun XItineraryScreen2() {
-    Column {
-        Card(elevation = 2.dp) { ItinerarySegment() }
-        Spacer(Modifier.size(16.dp))
-        val warning = OrbitTheme.colors.warning.main
-        Card(elevation = 2.dp) {
-            Box(
-                Modifier.drawWithCache {
-                    onDrawWithContent {
-                        drawContent()
-                        drawLine(
-                            color = warning,
-                            start = Offset.Zero,
-                            end = Offset(0f, size.height),
-                            strokeWidth = 4.dp.toPx(),
-                        )
-                    }
-                }
-            ) {
-                Column {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .background(OrbitTheme.colors.warning.subtle)
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(Icons.AlertCircle, contentDescription = null, tint = OrbitTheme.colors.warning.main)
-                        Spacer(modifier = Modifier.size(8.dp))
-                        Text(
-                            "Affected connection",
-                            style = OrbitTheme.typography.bodyNormal,
-                            color = OrbitTheme.colors.warning.strong
-                        )
-                    }
+    val jsonParser = Json {
+        ignoreUnknownKeys = true
+    }
+    val data = jsonParser.decodeFromString(Response.serializer(), json)
 
-                    ItinerarySegment()
+    Column {
+        data.itinerary.sectors.forEach { sector ->
+            sector.segment_groups.forEach { segmentGroup ->
+                segmentGroup.segments.forEach { segment ->
+                    Card(elevation = 2.dp) { ItinerarySegment(segment) }
+                    Spacer(Modifier.size(16.dp))
                 }
             }
         }
+//        Card(elevation = 2.dp) { ItinerarySegment(data) }
+//        Spacer(Modifier.size(16.dp))
+//        val warning = OrbitTheme.colors.warning.main
+//        Card(elevation = 2.dp) {
+//            Box(
+//                Modifier.drawWithCache {
+//                    onDrawWithContent {
+//                        drawContent()
+//                        drawLine(
+//                            color = warning,
+//                            start = Offset.Zero,
+//                            end = Offset(0f, size.height),
+//                            strokeWidth = 4.dp.toPx(),
+//                        )
+//                    }
+//                }
+//            ) {
+//                Column {
+//                    Row(
+//                        Modifier
+//                            .fillMaxWidth()
+//                            .background(OrbitTheme.colors.warning.subtle)
+//                            .padding(horizontal = 16.dp, vertical = 8.dp),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                    ) {
+//                        Icon(Icons.AlertCircle, contentDescription = null, tint = OrbitTheme.colors.warning.main)
+//                        Spacer(modifier = Modifier.size(8.dp))
+//                        Text(
+//                            "Affected connection",
+//                            style = OrbitTheme.typography.bodyNormal,
+//                            color = OrbitTheme.colors.warning.strong
+//                        )
+//                    }
+//
+//                    ItinerarySegment()
+//                }
+//            }
+//        }
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun ItinerarySegment() {
+private fun ItinerarySegment(data: Response.Segment) {
     val lineColor = Color(0xFFDCE3E9)
+    val startCircleColor = if (data.departure.warning) OrbitTheme.colors.warning.main else lineColor
+    val endCircleColor = if (data.arrival.warning) OrbitTheme.colors.warning.main else lineColor
     Column(
         Modifier
             .padding(vertical = 4.dp)
@@ -124,13 +153,13 @@ private fun ItinerarySegment() {
                     end = Offset(baseX, size.height)
                 )
                 drawCircle(
-                    color = lineColor,
+                    color = startCircleColor,
                     radius = 4.dp.toPx(),
                     center = Offset(baseX, size.height / 2),
                 )
             }
         ) {
-            ItineraryPlace()
+            ItineraryPlace(data.departure)
         }
         var visibleDetail by remember { mutableStateOf(false) }
         Box(
@@ -144,6 +173,7 @@ private fun ItinerarySegment() {
             }
         ) {
             ItineraryDetail(
+                data = data,
                 expanded = visibleDetail,
                 onExpandToggle = { visibleDetail = !visibleDetail },
             )
@@ -161,7 +191,7 @@ private fun ItinerarySegment() {
                     )
                 }
             ) {
-                ItineraryDetails()
+                ItineraryDetails(data = data)
             }
         }
         Box(
@@ -173,20 +203,23 @@ private fun ItinerarySegment() {
                     end = Offset(baseX, size.height / 2)
                 )
                 drawCircle(
-                    color = lineColor,
+                    color = endCircleColor,
                     radius = 4.dp.toPx(),
                     center = Offset(baseX, size.height / 2),
-
-                    )
+                )
             }
         ) {
-            ItineraryPlace()
+            ItineraryPlace(data.arrival)
         }
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
-private fun ItineraryPlace() {
+private fun ItineraryPlace(data: Response.Destination) {
+    val dateTime = LocalDateTime.parse(data.datetime_local)
+    val timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+    val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
     Row(
         Modifier
             .padding(vertical = 8.dp)
@@ -200,7 +233,7 @@ private fun ItineraryPlace() {
             horizontalAlignment = Alignment.End,
         ) {
             Text(
-                "18:25",
+                dateTime.format(timeFormatter),
                 style = OrbitTheme.typography.bodyNormal,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.End,
@@ -209,7 +242,7 @@ private fun ItineraryPlace() {
                 LocalContentEmphasis provides ContentEmphasis.Minor
             ) {
                 Text(
-                    "Mon, 30. 1.",
+                    dateTime.format(dateFormatter),
                     style = OrbitTheme.typography.bodySmall,
                     textAlign = TextAlign.End,
                     modifier = Modifier
@@ -224,7 +257,7 @@ private fun ItineraryPlace() {
             Modifier.padding(start = 8.dp)
         ) {
             Text(
-                "Prague · PRG",
+                "${data.city} · ${data.code}",
                 style = OrbitTheme.typography.bodyNormal,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
@@ -233,7 +266,7 @@ private fun ItineraryPlace() {
                 LocalContentEmphasis provides ContentEmphasis.Minor
             ) {
                 Text(
-                    "Václav Havel Airport Prague",
+                    data.station,
                     style = OrbitTheme.typography.bodySmall,
                     modifier = Modifier
                 )
@@ -242,13 +275,15 @@ private fun ItineraryPlace() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@SuppressLint("NewApi")
+@OptIn(ExperimentalAnimationApi::class, coil.annotation.ExperimentalCoilApi::class)
 @Composable
 fun ItineraryDetail(
+    data: Response.Segment,
     expanded: Boolean,
     onExpandToggle: () -> Unit,
 ) {
-
+    val duration = Duration.parse(data.duration.value)
     Row(
         Modifier
             .clickable { onExpandToggle() }
@@ -257,7 +292,7 @@ fun ItineraryDetail(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            "1h 20m",
+            "${duration.toHoursPart()}h ${duration.toMinutesPart()}m",
             style = OrbitTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.End,
@@ -267,7 +302,12 @@ fun ItineraryDetail(
         )
 
         Icon(
-            painter = Icons.AirplaneDown,
+            painter = when (data.vehicle_type.value) {
+                "airplane" -> Icons.AirplaneDown
+                "bus" -> Icons.Bus
+                "train" -> Icons.Train
+                else -> error(data.vehicle_type)
+            },
             contentDescription = null,
             modifier = Modifier
                 .size(16.dp)
@@ -278,10 +318,26 @@ fun ItineraryDetail(
                 .padding(horizontal = 8.dp)
                 .weight(1f)
         ) {
-            val badges = listOf("Ryanair", "Economy", "Wheelchair", "Ryanair", "Economy", "Wheelchair")
-            itemsIndexed(badges) { i, item ->
-                BadgeSecondary(Modifier.padding(start = if (i == 0) 0.dp else 4.dp)) {
-                    Text(text = item)
+            item {
+                Box {
+                    Image(
+                        painter = rememberImagePainter("https://images.kiwi.com/airlines/64x64/${data.carrier.carrier_icon_id}.png"),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .zIndex(1f),
+                    )
+
+                    BadgeSecondary(Modifier.padding(start = 0.dp).zIndex(0f)) {
+                        Spacer(Modifier.size(20.dp))
+                        Text(data.carrier.name)
+                    }
+                }
+            }
+            item {
+                BadgeSecondary(Modifier.padding(start = 4.dp)) {
+                    Text(data.cabin_class.value)
                 }
             }
         }
@@ -301,41 +357,63 @@ fun ItineraryDetail(
 }
 
 @Composable
-fun ItineraryDetails() {
+fun ItineraryDetails(data: Response.Segment) {
     ProvideMergedTextStyle(value = OrbitTheme.typography.bodySmall) {
         Column(
             Modifier
                 .padding(start = MainAxisOffset - 12.dp, end = 16.dp)
         ) {
-            ItineraryDetail(
-                "Connection info",
-                listOf(
-                    Triple(Icons.Airplane, "Carrier", "Ryanair"),
-                    Triple(Icons.InformationCircle, "Connection number", "RA 83459"),
+            for (segmentGroup in data.additional_info_groups) {
+                ItineraryDetail(
+                    title = segmentGroup.title,
+                    data = segmentGroup.items.map { item ->
+                        Triple(
+                            when (item.icon) {
+                                "info" -> Icons.InformationCircle
+                                "train" -> Icons.Train
+                                "airplane" -> Icons.AirplaneDown
+                                "bus" -> Icons.Bus
+                                "seat" -> Icons.Seat
+                                "wifi" -> Icons.Wifi
+                                "power_plug" -> Icons.PowerPlug
+                                "entertainment" -> Icons.Entertainment
+                                else -> error(item.icon)
+                            },
+                            item.name,
+                            item.value
+                        )
+                    }
                 )
-            )
-            ItineraryDetail(
-                "Seating info",
-                listOf(
-                    Triple(Icons.Seat, "Seat pitch", "76 cm"),
-                    Triple(Icons.Seat, "Seat width", "43 cm"),
-                    Triple(Icons.Seat, "Seat recline", "7 cm"),
-                    Triple(Icons.Entertainment, "Audio & video on demand", "No"),
-                    Triple(Icons.PowerPlug, "In-seat power", "No"),
-                    Triple(Icons.Wifi, "Wi-Fi on board", "Yes"),
-                )
-            )
-            ItineraryDetail(
-                "Some other pretty long multi-line info header with many words",
-                listOf(
-                    Triple(
-                        Icons.InformationCircle,
-                        "Some very very very long multi-line label with extra many words",
-                        "Value"
-                    ),
-                    Triple(Icons.CheckCircle, "A normal label", null),
-                )
-            )
+            }
+//            ItineraryDetail(
+//                "Connection info",
+//                listOf(
+//                    Triple(Icons.Airplane, "Carrier", "Ryanair"),
+//                    Triple(Icons.InformationCircle, "Connection number", "RA 83459"),
+//                )
+//            )
+//            ItineraryDetail(
+//                "Seating info",
+//                listOf(
+//                    Triple(Icons.Seat, "Seat pitch", "76 cm"),
+//                    Triple(Icons.Seat, "Seat width", "43 cm"),
+//                    Triple(Icons.Seat, "Seat recline", "7 cm"),
+//                    Triple(Icons.Entertainment, "Audio & video on demand", "No"),
+//                    Triple(Icons.PowerPlug, "In-seat power", "No"),
+//                    Triple(Icons.Wifi, "Wi-Fi on board", "Yes"),
+//                )
+//            )
+//            ItineraryDetail(
+//                "Some other pretty long multi-line info header with many words",
+//                listOf(
+//                    Triple(
+//                        Icons.InformationCircle,
+//                        "Some very very very long multi-line label with extra many words",
+//                        "Value"
+//                    ),
+//                    Triple(Icons.CheckCircle, "A normal label", null),
+//                )
+//            )
         }
     }
 }
@@ -395,4 +473,4 @@ fun ItineraryDetail(
     }
 }
 
-private val MainAxisOffset = 85.dp
+private val MainAxisOffset = 95.dp

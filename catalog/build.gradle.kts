@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.konan.properties.loadProperties
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("plugin.serialization")
     id("org.jmailen.kotlinter")
 }
 
@@ -95,10 +96,12 @@ dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.compose.runtimeLivedata)
     implementation(libs.compose.tooling)
+    implementation("io.coil-kt:coil-compose:1.3.2")
 
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.datetime)
+    implementation(libs.kotlin.serialization)
 
     implementation(libs.accompanist.insets)
     implementation(libs.accompanist.systemController)

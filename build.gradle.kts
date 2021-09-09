@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.5.21" apply false
     kotlin("android") version "1.5.21" apply false
-    kotlin("plugin.serialization") version "1.5.0" apply false
+    kotlin("plugin.serialization") version "1.5.21" apply false
     id("com.android.application") version "7.0.2" apply false
     id("org.jmailen.kotlinter") version "3.6.0" apply false
     id("com.vanniktech.maven.publish") version "0.17.0" apply false
