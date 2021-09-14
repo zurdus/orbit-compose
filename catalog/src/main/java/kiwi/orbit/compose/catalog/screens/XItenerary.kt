@@ -93,44 +93,44 @@ fun XItineraryScreen2() {
                 }
             }
         }
-//        Card(elevation = 2.dp) { ItinerarySegment(data) }
-//        Spacer(Modifier.size(16.dp))
-//        val warning = OrbitTheme.colors.warning.main
-//        Card(elevation = 2.dp) {
-//            Box(
-//                Modifier.drawWithCache {
-//                    onDrawWithContent {
-//                        drawContent()
-//                        drawLine(
-//                            color = warning,
-//                            start = Offset.Zero,
-//                            end = Offset(0f, size.height),
-//                            strokeWidth = 4.dp.toPx(),
-//                        )
-//                    }
-//                }
-//            ) {
-//                Column {
-//                    Row(
-//                        Modifier
-//                            .fillMaxWidth()
-//                            .background(OrbitTheme.colors.warning.subtle)
-//                            .padding(horizontal = 16.dp, vertical = 8.dp),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                    ) {
-//                        Icon(Icons.AlertCircle, contentDescription = null, tint = OrbitTheme.colors.warning.main)
-//                        Spacer(modifier = Modifier.size(8.dp))
-//                        Text(
-//                            "Affected connection",
-//                            style = OrbitTheme.typography.bodyNormal,
-//                            color = OrbitTheme.colors.warning.strong
-//                        )
-//                    }
-//
-//                    ItinerarySegment()
-//                }
-//            }
-//        }
+//        Card(elevation = 2.dp) { ItinerarySegment() }
+        Spacer(Modifier.size(16.dp))
+        val warning = OrbitTheme.colors.warning.main
+        Card(elevation = 2.dp) {
+            Box(
+                Modifier.drawWithCache {
+                    onDrawWithContent {
+                        drawContent()
+                        drawLine(
+                            color = warning,
+                            start = Offset.Zero,
+                            end = Offset(0f, size.height),
+                            strokeWidth = 4.dp.toPx(),
+                        )
+                    }
+                }
+            ) {
+                Column {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(OrbitTheme.colors.warning.subtle)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(Icons.AlertCircle, contentDescription = null, tint = OrbitTheme.colors.warning.main)
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Text(
+                            "Affected connection",
+                            style = OrbitTheme.typography.bodyNormal,
+                            color = OrbitTheme.colors.warning.strong
+                        )
+                    }
+
+                    ItinerarySegment(data.itinerary.sectors.first().segment_groups.first().segments.first())
+                }
+            }
+        }
     }
 }
 
@@ -385,35 +385,35 @@ fun ItineraryDetails(data: Response.Segment) {
                     }
                 )
             }
-//            ItineraryDetail(
-//                "Connection info",
-//                listOf(
-//                    Triple(Icons.Airplane, "Carrier", "Ryanair"),
-//                    Triple(Icons.InformationCircle, "Connection number", "RA 83459"),
-//                )
-//            )
-//            ItineraryDetail(
-//                "Seating info",
-//                listOf(
-//                    Triple(Icons.Seat, "Seat pitch", "76 cm"),
-//                    Triple(Icons.Seat, "Seat width", "43 cm"),
-//                    Triple(Icons.Seat, "Seat recline", "7 cm"),
-//                    Triple(Icons.Entertainment, "Audio & video on demand", "No"),
-//                    Triple(Icons.PowerPlug, "In-seat power", "No"),
-//                    Triple(Icons.Wifi, "Wi-Fi on board", "Yes"),
-//                )
-//            )
-//            ItineraryDetail(
-//                "Some other pretty long multi-line info header with many words",
-//                listOf(
-//                    Triple(
-//                        Icons.InformationCircle,
-//                        "Some very very very long multi-line label with extra many words",
-//                        "Value"
-//                    ),
-//                    Triple(Icons.CheckCircle, "A normal label", null),
-//                )
-//            )
+            ItineraryDetail(
+                "Connection info",
+                listOf(
+                    Triple(Icons.Airplane, "Carrier", "Ryanair"),
+                    Triple(Icons.InformationCircle, "Connection number", "RA 83459"),
+                )
+            )
+            ItineraryDetail(
+                "Seating info",
+                listOf(
+                    Triple(Icons.Seat, "Seat pitch", "76 cm"),
+                    Triple(Icons.Seat, "Seat width", "43 cm"),
+                    Triple(Icons.Seat, "Seat recline", "7 cm"),
+                    Triple(Icons.Entertainment, "Audio & video on demand", "No"),
+                    Triple(Icons.PowerPlug, "In-seat power", "No"),
+                    Triple(Icons.Wifi, "Wi-Fi on board", "Yes"),
+                )
+            )
+            ItineraryDetail(
+                "Some other pretty long multi-line info header with many words",
+                listOf(
+                    Triple(
+                        Icons.InformationCircle,
+                        "Some very very very long multi-line label with extra many words",
+                        "Value"
+                    ),
+                    Triple(Icons.CheckCircle, "A normal label", null),
+                )
+            )
         }
     }
 }
